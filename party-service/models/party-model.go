@@ -11,6 +11,7 @@ type Party struct {
 	RestaurantId string
 	ClientSet map[string]Client
 	OrderMap map[string][]ItemOrder
+	IsOk bool
 }
 
 func NewParty(vendorUUID string, host Client) *Party {
@@ -19,6 +20,7 @@ func NewParty(vendorUUID string, host Client) *Party {
 		RestaurantId: vendorUUID,
 		ClientSet:   make(map[string]Client),
 		OrderMap:     make(map[string][]ItemOrder),
+		IsOk: false,
 	}
 	p.ClientSet["host"] = host
 	return p
@@ -63,6 +65,14 @@ func (p *Party) GetClientOrder(client Client) []ItemOrder {
 
 func (p *Party) GetHost() Client {
 	return p.ClientSet["host"]
+}
+
+func (p *Party) GetClients() []Client {
+	var list []Client
+	for _, client := range p.ClientSet {
+		list = append(list, client)
+	}
+	return list
 }
 
 // TODO Avoid collisions
