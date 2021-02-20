@@ -1,0 +1,77 @@
+package models
+
+import (
+	"bytes"
+	"math/rand"
+	"time"
+)
+
+type Party struct {
+	TAG string
+	RestaurantId string
+	ClientSet map[string]Client
+	OrderMap map[string][]ItemOrder
+}
+
+func NewParty(vendorUUID string, host Client) *Party {
+	p := &Party{
+		TAG:          createTag(),
+		RestaurantId: vendorUUID,
+		ClientSet:   make(map[string]Client),
+		OrderMap:     make(map[string][]ItemOrder),
+	}
+	p.ClientSet["host"] = host
+	return p
+}
+
+func (p *Party) AddClient(client Client) {
+	if _, ok := p.ClientSet[client.Id]; !ok {
+		p.OrderMap[client.Id] = []ItemOrder{}
+		p.ClientSet[client.Id] = client
+	}
+}
+
+func (p *Party) AddClientOrder(item ItemOrder, client Client) {
+	clientOrder := p.OrderMap[client.Id]
+	clientOrder = append(clientOrder, item)
+	p.OrderMap[client.Id] = clientOrder
+}
+
+func (p *Party) addClientOrders(items []ItemOrder, client Client) {
+	clientOrder := p.OrderMap[client.Id]
+	clientOrder = append(clientOrder, items...)
+	p.OrderMap[client.Id] = clientOrder
+}
+
+func (p *Party) RemoveClient(client Client) {
+	items := p.OrderMap[client.Id]
+	delete(p.ClientSet, client.Id)
+	p.addClientOrders(items, p.GetHost())
+}
+
+func (p *Party) GetCompleteOrder() []ItemOrder {
+	var items []ItemOrder
+	for _, itemList := range p.OrderMap {
+		items = append(items, itemList...)
+	}
+	return items
+}
+
+func (p *Party) GetClientOrder(client Client) []ItemOrder {
+	return p.OrderMap[client.Id]
+}
+
+func (p *Party) GetHost() Client {
+	return p.ClientSet["host"]
+}
+
+// TODO Avoid collisions
+func createTag() string {
+	rand.Seed(time.Now().UnixNano())
+	buff := bytes.NewBufferString("")
+	for i := 0; i < 4; i++ {
+		letter := rand.Intn(90 - 65) + 65
+		buff.WriteString(string(rune(letter)))
+	}
+	return buff.String()
+}
