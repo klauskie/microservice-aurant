@@ -27,6 +27,8 @@ func main() {
 		api.GET("/order/:partyID", controllers.GetClientOrder)
 		api.GET("/party-order/:partyID", controllers.GetAllOrder)
 		api.POST("/prepare-order/:partyID", controllers.SendPrepareCommandOrder)
+
+		api.POST("/test/prepare-order", controllers.SendPrepareCommandOrderTest)
 	}
 
 	r.Run(":8081")

@@ -1,12 +1,17 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"klauskie.com/microservice-aurant/party-service/models"
 	"klauskie.com/microservice-aurant/party-service/repository"
+	"klauskie.com/microservice-aurant/party-service/util"
+	"log"
+	"net/http"
+	"time"
 )
 
 // GET /party/:vendorID
@@ -226,11 +231,96 @@ func SendPrepareCommandOrder(c *gin.Context) {
 		return
 	}
 
-	// TODO trigger goroutine to save orders to order-management-service
+	// HTTP post batch to api-order
+	go sendOrderBatch(*party)
 
 	c.JSON(201, gin.H{
 		"message": "Orders pushed",
 		"party-tag": party.TAG,
 		"party": party,
 	})
+}
+
+// POST /test/prepare-order
+func SendPrepareCommandOrderTest(c *gin.Context) {
+	order1 := models.ItemOrder{
+		ItemId:       "111",
+		Instructions: "No onions",
+		Quantity:     1,
+	}
+
+	order2 := models.ItemOrder{
+		ItemId:       "222",
+		Instructions: "",
+		Quantity:     2,
+	}
+
+	order3 := models.ItemOrder{
+		ItemId:       "333",
+		Instructions: "extra napkins",
+		Quantity:     1,
+	}
+
+	oMap := map[string][]models.ItemOrder{}
+	oMap["alice"] = []models.ItemOrder{order1, order2}
+	oMap["bob"] = []models.ItemOrder{order3}
+
+
+	party := models.Party{
+		TAG:          "TEST",
+		RestaurantId: "1234",
+		ClientSet:    nil,
+		OrderMap:     oMap,
+		IsOk:         true,
+	}
+
+	go sendOrderBatch(party)
+
+	c.JSON(201, gin.H{
+		"message": "Orders pushed",
+		"party-tag": party.TAG,
+		"party": party,
+	})
+}
+
+func sendOrderBatch(party models.Party) {
+
+	batch := struct{
+		TAG string `json:"tag"`
+		RestaurantId string `json:"restaurant_id"`
+		Orders []models.ItemOrder `json:"orders"`
+	}{
+		TAG: party.TAG,
+		RestaurantId: party.RestaurantId,
+		Orders: party.GetCompleteOrder(),
+	}
+
+	requestBody, err := json.Marshal(batch)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+
+	request, err := http.NewRequest("POST", util.URL_ORDER_API_SEND_BATCH, bytes.NewBuffer(requestBody))
+	if err != nil {
+		log.Fatal(err)
+	}
+	request.Header.Set("Content-type", "application/json")
+
+	resp, err := client.Do(request)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println(string(body))
 }

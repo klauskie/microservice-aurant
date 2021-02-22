@@ -2,18 +2,16 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"klauskie.com/microservice-aurant/order-mgmt-service/controllers"
 )
 
 func main() {
 	r := gin.Default()
 
-	r.GET("/", HomePage)
+	api := r.Group("/api-order")
+	{
+		api.POST("/batch", controllers.SaveOrderBatch)
+	}
 
 	r.Run(":8082")
-}
-
-func HomePage(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"service": "Order Management Service",
-	})
 }
