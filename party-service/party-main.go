@@ -8,8 +8,7 @@ import (
 func main() {
 	r := gin.Default()
 
-	// TODO handle client
-	// TODO handle validations
+	r.Use(controllers.TokenAuthMiddleware)
 
 	api := r.Group("/party-api")
 	{

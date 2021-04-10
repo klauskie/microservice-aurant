@@ -16,6 +16,7 @@ func main() {
 		api.POST("/guest-login", controllers.LoginAsGuest)
 		api.DELETE("/logout", controllers.Logout)
 		api.GET("/profile", controllers.Profile)
+		api.GET("/token-validation/:token", controllers.TokenValidation)
 	}
 
 	r.Run(":8083")

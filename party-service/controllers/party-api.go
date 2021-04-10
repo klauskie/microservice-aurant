@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io/ioutil"
-	"klauskie.com/microservice-aurant/party-service/models"
-	"klauskie.com/microservice-aurant/party-service/repository"
-	"klauskie.com/microservice-aurant/party-service/util"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"klauskie.com/microservice-aurant/party-service/models"
+	"klauskie.com/microservice-aurant/party-service/repository"
+	"klauskie.com/microservice-aurant/party-service/util"
 )
 
 // GET /party/:vendorID
@@ -206,7 +207,7 @@ func GetAllOrder(c *gin.Context) {
 	})
 }
 
-// POST /prepare-order/:partyID
+// POST TEST /prepare-order/:partyID
 func SendPrepareCommandOrder(c *gin.Context) {
 	partyId := c.Param("partyID")
 
@@ -264,7 +265,6 @@ func SendPrepareCommandOrderTest(c *gin.Context) {
 	oMap := map[string][]models.ItemOrder{}
 	oMap["alice"] = []models.ItemOrder{order1, order2}
 	oMap["bob"] = []models.ItemOrder{order3}
-
 
 	party := models.Party{
 		TAG:          "TEST",

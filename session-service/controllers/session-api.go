@@ -9,6 +9,7 @@ import (
 	"klauskie.com/microservice-aurant/session-service/models"
 	"klauskie.com/microservice-aurant/session-service/repository"
 	"klauskie.com/microservice-aurant/session-service/util"
+	"time"
 )
 
 // TODO Register account
@@ -33,7 +34,6 @@ func LoginAsGuest(c *gin.Context) {
 	userData := struct {
 		Name string `json:"name"`
 		VendorID string `json:"vendor_id"`
-		PartyID string `json:"party_id"`
 	}{}
 	if err := json.Unmarshal(body, &userData); err != nil {
 		fmt.Println(err.Error())
@@ -43,15 +43,16 @@ func LoginAsGuest(c *gin.Context) {
 		return
 	}
 
+	createdAt := time.Now().Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"vendor_id":  userData.VendorID,
 		"name": userData.Name,
-		"party_id":  userData.PartyID,
+		"created_at":  createdAt,
 	})
 
 	tokenString, err := token.SignedString([]byte(util.SECRET_SESSION_KEY))
 
-	simpleUser := models.NewSimpleUser(tokenString, userData.Name, userData.PartyID, userData.VendorID)
+	simpleUser := models.NewSimpleUser(tokenString, userData.Name, userData.VendorID, createdAt)
 	repository.GetSessionRepository().Add(&simpleUser)
 
 	c.JSON(202, gin.H{
@@ -74,6 +75,22 @@ func Logout(c *gin.Context) {
 // GET /profile
 func Profile(c *gin.Context) {
 	tokenString := c.Request.Header.Get("token")
+	if !util.IsTokenValid(tokenString) {
+		c.JSON(401, gin.H{
+			"message": "Invalid token",
+		})
+		return
+	}
+	user := repository.GetSessionRepository().Get(tokenString)
+	c.JSON(202, gin.H{
+		"message": "Retrieved user",
+		"user": user,
+	})
+}
+
+// GET /token-validation/:token
+func TokenValidation(c *gin.Context) {
+	tokenString := c.Param("token")
 	if !util.IsTokenValid(tokenString) {
 		c.JSON(401, gin.H{
 			"message": "Invalid token",
