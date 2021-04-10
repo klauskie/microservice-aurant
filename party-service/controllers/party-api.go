@@ -68,6 +68,12 @@ func KickFromParty(c *gin.Context) {
 	clientID := c.Param("clientID")
 
 	party := repository.GetPartyRepository().Get(partyId)
+	if !party.IsClientOnParty(clientID) {
+		c.JSON(401, gin.H{
+			"message": "Given client does not belong in party",
+		})
+		return
+	}
 	party.RemoveClient(clientID)
 
 	c.JSON(202, gin.H{
@@ -95,7 +101,16 @@ func RemoveParty(c *gin.Context) {
 // GET /party-clients/:partyID
 func GetPartyClients(c *gin.Context) {
 	partyId := c.Param("partyID")
+	clientID := c.GetString("token")
+
 	party := repository.GetPartyRepository().Get(partyId)
+
+	if !party.IsClientOnParty(clientID) {
+		c.JSON(401, gin.H{
+			"message": "Given client does not belong in party",
+		})
+		return
+	}
 
 	c.JSON(200, gin.H{
 		"message": "GET party",
@@ -107,7 +122,16 @@ func GetPartyClients(c *gin.Context) {
 // GET /party-status/:partyID
 func GetPartyStatus(c *gin.Context) {
 	partyId := c.Param("partyID")
+	clientID := c.GetString("token")
+
 	party := repository.GetPartyRepository().Get(partyId)
+
+	if !party.IsClientOnParty(clientID) {
+		c.JSON(401, gin.H{
+			"message": "Given client does not belong in party",
+		})
+		return
+	}
 
 	c.JSON(200, gin.H{
 		"message": "GET party",
@@ -171,6 +195,14 @@ func CreateClientOrder(c *gin.Context) {
 	item.Owner = tempClient
 
 	party := repository.GetPartyRepository().Get(partyId)
+
+	if !party.IsClientOnParty(clientID) {
+		c.JSON(401, gin.H{
+			"message": "Given client does not belong in party",
+		})
+		return
+	}
+
 	if !party.IsOk {
 		c.JSON(403, gin.H{
 			"message": "Party is no ready",
@@ -198,6 +230,13 @@ func GetClientOrder(c *gin.Context) {
 
 	party := repository.GetPartyRepository().Get(partyId)
 
+	if !party.IsClientOnParty(clientID) {
+		c.JSON(401, gin.H{
+			"message": "Given client does not belong in party",
+		})
+		return
+	}
+
 	c.JSON(200, gin.H{
 		"message": "Order fetched",
 		"party-tag": party.TAG,
@@ -208,8 +247,16 @@ func GetClientOrder(c *gin.Context) {
 // GET /party-order/:partyID
 func GetAllOrder(c *gin.Context) {
 	partyId := c.Param("partyID")
+	clientID := c.GetString("token")
 
 	party := repository.GetPartyRepository().Get(partyId)
+
+	if !party.IsClientOnParty(clientID) {
+		c.JSON(401, gin.H{
+			"message": "Given client does not belong in party",
+		})
+		return
+	}
 
 	c.JSON(200, gin.H{
 		"message": "Complete Order fetched",

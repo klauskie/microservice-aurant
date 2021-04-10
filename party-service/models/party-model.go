@@ -75,6 +75,17 @@ func (p *Party) GetClients() []Client {
 	return list
 }
 
+func (p *Party) IsClientOnParty(clientID string) bool {
+	// Verify content instead of key
+	list := p.GetClients()
+	for _, client := range list {
+		if client.Id == clientID {
+			return true
+		}
+	}
+	return false
+}
+
 // TODO Avoid collisions
 func createTag() string {
 	rand.Seed(time.Now().UnixNano())
