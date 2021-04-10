@@ -13,10 +13,10 @@ func main() {
 	api := r.Group("/party-api")
 	{
 		// TODO use query params
-		api.POST("/party/:vendorID", controllers.CreateParty)
+		api.POST("/party", controllers.CreateParty)
 		api.PUT("/party/:partyID", controllers.JoinParty)
 		api.GET("/party/:partyID", controllers.GetParty)
-		api.DELETE("/party/:partyID/kick/:client", controllers.KickFromParty)
+		api.DELETE("/party/:partyID/kick/:clientID", controllers.KickFromParty)
 		api.DELETE("/party/:partyID", controllers.RemoveParty)
 		api.GET("/party-clients/:partyID", controllers.GetPartyClients)
 		api.GET("/party-status/:partyID", controllers.GetPartyClients)

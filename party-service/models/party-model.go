@@ -45,9 +45,9 @@ func (p *Party) addClientOrders(items []ItemOrder, client Client) {
 	p.OrderMap[client.Id] = clientOrder
 }
 
-func (p *Party) RemoveClient(client Client) {
-	items := p.OrderMap[client.Id]
-	delete(p.ClientSet, client.Id)
+func (p *Party) RemoveClient(clientID string) {
+	items := p.OrderMap[clientID]
+	delete(p.ClientSet, clientID)
 	p.addClientOrders(items, p.GetHost())
 }
 

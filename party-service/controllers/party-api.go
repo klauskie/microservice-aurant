@@ -17,9 +17,12 @@ import (
 
 // GET /party/:vendorID
 func CreateParty(c *gin.Context) {
-	vendorUUID := c.Param("vendorID")
+	//vendorUUID := c.Param("vendorID")
+	vendorUUID := c.GetString("vendorID") // From middleware
+	token := c.GetString("token") // From middleware
+	clientName := c.GetString("clientName") // From middleware
 
-	party := models.NewParty(vendorUUID, models.Client{})
+	party := models.NewParty(vendorUUID, models.NewClient(token, clientName))
 	repository.GetPartyRepository().Add(party)
 
 	c.JSON(201, gin.H{
@@ -44,7 +47,10 @@ func GetParty(c *gin.Context) {
 // PUT /party/:partyID
 func JoinParty(c *gin.Context) {
 	partyId := c.Param("partyID")
-	client := models.Client{}
+	token := c.GetString("token") // From middleware
+	clientName := c.GetString("clientName") // From middleware
+
+	client := models.NewClient(token, clientName)
 
 	party := repository.GetPartyRepository().Get(partyId)
 	party.AddClient(client)
@@ -59,10 +65,10 @@ func JoinParty(c *gin.Context) {
 // DELETE /party/:partyID/kick/:client
 func KickFromParty(c *gin.Context) {
 	partyId := c.Param("partyID")
-	client := models.Client{}
+	clientID := c.Param("clientID")
 
 	party := repository.GetPartyRepository().Get(partyId)
-	party.RemoveClient(client)
+	party.RemoveClient(clientID)
 
 	c.JSON(202, gin.H{
 		"message": "DELETE client",
@@ -113,13 +119,14 @@ func GetPartyStatus(c *gin.Context) {
 // PUT /party-status/:partyID
 func UpdatePartyStatus(c *gin.Context) {
 	partyId := c.Param("partyID")
+	clientID := c.GetString("token")
 
 	body, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	status := struct {
-		ready bool
+		Ready bool `json:"ready"`
 	}{}
 	if err := json.Unmarshal(body, &status); err != nil {
 		fmt.Println(err.Error())
@@ -127,9 +134,8 @@ func UpdatePartyStatus(c *gin.Context) {
 
 	party := repository.GetPartyRepository().Get(partyId)
 
-	// TODO Validate sender is host?
-	client := models.Client{}
-	if party.GetHost().Id != client.Id {
+	// Validate sender is host
+	if party.GetHost().Id != clientID {
 		c.JSON(400, gin.H{
 			"message": "Action must be performed by party host",
 			"party-tag": party.TAG,
@@ -137,7 +143,7 @@ func UpdatePartyStatus(c *gin.Context) {
 		return
 	}
 
-	party.IsOk = status.ready
+	party.IsOk = status.Ready
 
 	c.JSON(202, gin.H{
 		"message": "Party status updated",
@@ -149,7 +155,8 @@ func UpdatePartyStatus(c *gin.Context) {
 // POST /order/:partyID
 func CreateClientOrder(c *gin.Context) {
 	partyId := c.Param("partyID")
-	client := models.Client{}
+	clientID := c.GetString("token")
+	clientName := c.GetString("clientName")
 
 	body, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
@@ -160,7 +167,8 @@ func CreateClientOrder(c *gin.Context) {
 		fmt.Println(err.Error())
 	}
 
-	item.Owner = client
+	tempClient := models.NewClient(clientID, clientName)
+	item.Owner = tempClient
 
 	party := repository.GetPartyRepository().Get(partyId)
 	if !party.IsOk {
@@ -171,26 +179,29 @@ func CreateClientOrder(c *gin.Context) {
 		})
 		return
 	}
-	party.AddClientOrder(item, client)
+	party.AddClientOrder(item, tempClient)
 
 	c.JSON(201, gin.H{
 		"message": "Order added",
 		"party-tag": party.TAG,
-		"Orders": party.GetClientOrder(client),
+		"Orders": party.GetClientOrder(tempClient),
 	})
 }
 
 // GET /order/:partyID
 func GetClientOrder(c *gin.Context) {
 	partyId := c.Param("partyID")
-	client := models.Client{}
+	clientID := c.GetString("token")
+	clientName := c.GetString("clientName")
+
+	tempClient := models.NewClient(clientID, clientName)
 
 	party := repository.GetPartyRepository().Get(partyId)
 
 	c.JSON(200, gin.H{
 		"message": "Order fetched",
 		"party-tag": party.TAG,
-		"Orders": party.GetClientOrder(client),
+		"Orders": party.GetClientOrder(tempClient),
 	})
 }
 
@@ -207,15 +218,14 @@ func GetAllOrder(c *gin.Context) {
 	})
 }
 
-// POST TEST /prepare-order/:partyID
+// POST /prepare-order/:partyID
 func SendPrepareCommandOrder(c *gin.Context) {
 	partyId := c.Param("partyID")
+	clientID := c.GetString("token")
 
 	party := repository.GetPartyRepository().Get(partyId)
 
-	// TODO Validate sender is host?
-	client := models.Client{}
-	if party.GetHost().Id != client.Id {
+	if party.GetHost().Id != clientID {
 		c.JSON(400, gin.H{
 			"message": "Action must be performed by party host",
 			"party-tag": party.TAG,

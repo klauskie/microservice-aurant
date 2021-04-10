@@ -1,8 +1,10 @@
 package models
 
 type SimpleUser struct {
-	Token, Name, VendorID string
-	TimeStamp int64
+	Token string `json:"token"`
+	Name string `json:"name"`
+	VendorID string `json:"vendor_id"`
+	TimeStamp int64 `json:"time_stamp"`
 }
 
 func NewSimpleUser(token, name, vendorD string, createdAt int64) SimpleUser {

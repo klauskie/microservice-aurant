@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,6 +28,24 @@ func TokenAuthMiddleware(c *gin.Context) {
 		respondWithError(c, 401, "Invalid API token")
 		return
 	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	respData := struct {
+		User struct {
+			Name string `json:"name"`
+			VendorID string `json:"vendor_id"`
+		} `json:"user"`
+	}{}
+	if err := json.Unmarshal(body, &respData); err != nil {
+		fmt.Println(err.Error())
+	}
+
+	c.Set("clientName", respData.User.Name)
+	c.Set("vendorID", respData.User.VendorID)
+	c.Set("token", token)
 
 	c.Next()
 }
