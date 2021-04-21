@@ -23,12 +23,18 @@ func CreateParty(c *gin.Context) {
 	clientName := c.GetString("clientName") // From middleware
 
 	party := models.NewParty(vendorUUID, models.NewClient(token, clientName))
+	if party == nil {
+		c.JSON(400, gin.H{
+			"message": "No party found with given TAG",
+		})
+		return
+	}
 	repository.GetPartyRepository().Add(party)
 
 	c.JSON(201, gin.H{
 		"message": "Party created successfully",
 		"party-tag": party.TAG,
-		"party": party,
+		"party": models.NewPartyWrapper(*party),
 	})
 }
 
@@ -36,6 +42,12 @@ func CreateParty(c *gin.Context) {
 func GetParty(c *gin.Context) {
 	partyId := c.Param("partyID")
 	party := repository.GetPartyRepository().Get(partyId)
+	if party == nil {
+		c.JSON(400, gin.H{
+			"message": "No party found with given TAG",
+		})
+		return
+	}
 
 	pWrapper := models.NewPartyWrapper(*party)
 
@@ -55,12 +67,19 @@ func JoinParty(c *gin.Context) {
 	client := models.NewClient(token, clientName)
 
 	party := repository.GetPartyRepository().Get(partyId)
+	if party == nil {
+		c.JSON(400, gin.H{
+			"message": "No party found with given TAG",
+		})
+		return
+	}
+
 	party.AddClient(client)
 
 	c.JSON(200, gin.H{
 		"message": "Joined to party successfully",
 		"party-tag": party.TAG,
-		"party": party,
+		"party": models.NewPartyWrapper(*party),
 	})
 }
 
@@ -70,6 +89,13 @@ func KickFromParty(c *gin.Context) {
 	clientID := c.Param("clientID")
 
 	party := repository.GetPartyRepository().Get(partyId)
+	if party == nil {
+		c.JSON(400, gin.H{
+			"message": "No party found with given TAG",
+		})
+		return
+	}
+
 	if !party.IsClientOnParty(clientID) {
 		c.JSON(401, gin.H{
 			"message": "Given client does not belong in party",
@@ -106,6 +132,12 @@ func GetPartyClients(c *gin.Context) {
 	clientID := c.GetString("token")
 
 	party := repository.GetPartyRepository().Get(partyId)
+	if party == nil {
+		c.JSON(400, gin.H{
+			"message": "No party found with given TAG",
+		})
+		return
+	}
 
 	if !party.IsClientOnParty(clientID) {
 		c.JSON(401, gin.H{
@@ -127,6 +159,12 @@ func GetPartyStatus(c *gin.Context) {
 	clientID := c.GetString("token")
 
 	party := repository.GetPartyRepository().Get(partyId)
+	if party == nil {
+		c.JSON(400, gin.H{
+			"message": "No party found with given TAG",
+		})
+		return
+	}
 
 	if !party.IsClientOnParty(clientID) {
 		c.JSON(401, gin.H{
@@ -159,10 +197,16 @@ func UpdatePartyStatus(c *gin.Context) {
 	}
 
 	party := repository.GetPartyRepository().Get(partyId)
+	if party == nil {
+		c.JSON(400, gin.H{
+			"message": "No party found with given TAG",
+		})
+		return
+	}
 
 	// Validate sender is host
 	if party.GetHost().Id != clientID {
-		c.JSON(400, gin.H{
+		c.JSON(401, gin.H{
 			"message": "Action must be performed by party host",
 			"party-tag": party.TAG,
 		})
@@ -197,6 +241,12 @@ func CreateClientOrder(c *gin.Context) {
 	item.Owner = tempClient
 
 	party := repository.GetPartyRepository().Get(partyId)
+	if party == nil {
+		c.JSON(400, gin.H{
+			"message": "No party found with given TAG",
+		})
+		return
+	}
 
 	if !party.IsClientOnParty(clientID) {
 		c.JSON(401, gin.H{
@@ -231,6 +281,12 @@ func GetClientOrder(c *gin.Context) {
 	tempClient := models.NewClient(clientID, clientName)
 
 	party := repository.GetPartyRepository().Get(partyId)
+	if party == nil {
+		c.JSON(400, gin.H{
+			"message": "No party found with given TAG",
+		})
+		return
+	}
 
 	if !party.IsClientOnParty(clientID) {
 		c.JSON(401, gin.H{
@@ -252,6 +308,12 @@ func GetAllOrder(c *gin.Context) {
 	clientID := c.GetString("token")
 
 	party := repository.GetPartyRepository().Get(partyId)
+	if party == nil {
+		c.JSON(400, gin.H{
+			"message": "No party found with given TAG",
+		})
+		return
+	}
 
 	if !party.IsClientOnParty(clientID) {
 		c.JSON(401, gin.H{
@@ -273,6 +335,12 @@ func SendPrepareCommandOrder(c *gin.Context) {
 	clientID := c.GetString("token")
 
 	party := repository.GetPartyRepository().Get(partyId)
+	if party == nil {
+		c.JSON(400, gin.H{
+			"message": "No party found with given TAG",
+		})
+		return
+	}
 
 	if party.GetHost().Id != clientID {
 		c.JSON(400, gin.H{
@@ -297,7 +365,7 @@ func SendPrepareCommandOrder(c *gin.Context) {
 	c.JSON(201, gin.H{
 		"message": "Orders pushed",
 		"party-tag": party.TAG,
-		"party": party,
+		"party": models.NewPartyWrapper(*party),
 	})
 }
 
@@ -338,7 +406,7 @@ func SendPrepareCommandOrderTest(c *gin.Context) {
 	c.JSON(201, gin.H{
 		"message": "Orders pushed",
 		"party-tag": party.TAG,
-		"party": party,
+		"party": models.NewPartyWrapper(party),
 	})
 }
 
