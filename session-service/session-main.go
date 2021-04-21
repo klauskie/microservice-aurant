@@ -8,6 +8,8 @@ import (
 func main() {
 	r := gin.Default()
 
+	r.Use(controllers.CORSMiddleware)
+
 	api := r.Group("/session-api")
 	{
 		// TODO use query params

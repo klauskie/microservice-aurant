@@ -37,10 +37,12 @@ func GetParty(c *gin.Context) {
 	partyId := c.Param("partyID")
 	party := repository.GetPartyRepository().Get(partyId)
 
+	pWrapper := models.NewPartyWrapper(*party)
+
 	c.JSON(200, gin.H{
 		"message": "GET party",
 		"party-tag": party.TAG,
-		"party": party,
+		"party": pWrapper,
 	})
 }
 

@@ -8,6 +8,7 @@ import (
 func main() {
 	r := gin.Default()
 
+	r.Use(controllers.CORSMiddleware)
 	r.Use(controllers.TokenAuthMiddleware)
 
 	api := r.Group("/party-api")
