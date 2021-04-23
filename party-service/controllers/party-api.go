@@ -149,7 +149,7 @@ func GetPartyClients(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "GET party",
 		"party-tag": party.TAG,
-		"clients": party.GetClients,
+		"clients": party.GetClients(),
 	})
 }
 
