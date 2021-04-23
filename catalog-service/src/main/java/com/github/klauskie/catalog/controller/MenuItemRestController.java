@@ -91,6 +91,17 @@ public class MenuItemRestController {
         }
     }
 
+    @PostMapping("/item-definition")
+    public Map<String, MenuItem> itemListDefinition(@RequestBody List<String> itemListReq) {
+        Map<String, MenuItem> menuItemMap = new HashMap<>();
+        for (String itemID : itemListReq) {
+            if (!menuItemMap.containsKey(itemID)) {
+                menuItemMap.put(itemID, itemRepository.findByItemId(itemID));
+            }
+        }
+        return menuItemMap;
+    }
+
     @PutMapping("/item")
     public void updateMenuItem(@RequestBody Map<String, Object> requestMap) {
         MenuItem existingItem = itemRepository.findByItemId((String) requestMap.get(Constant.KEY_ITEM_ID));
