@@ -2,6 +2,7 @@ package models
 
 import (
 	"bytes"
+	"errors"
 	"math/rand"
 	"time"
 )
@@ -51,12 +52,20 @@ func (p *Party) RemoveClient(clientID string) {
 	p.addClientOrders(items, p.GetHost())
 }
 
-func (p *Party) GetCompleteOrder() []ItemOrder {
-	var items []ItemOrder
-	for _, itemList := range p.OrderMap {
-		items = append(items, itemList...)
+func (p *Party) GetCompleteOrder() []ClientOrderWrapper {
+	var wrappers []ClientOrderWrapper
+	for key, itemList := range p.OrderMap {
+		client, clientError := p.GetClientByID(key)
+		if clientError != nil {
+			continue
+		}
+		wrap := ClientOrderWrapper{
+			Client:    client,
+			OrderList: itemList,
+		}
+		wrappers = append(wrappers, wrap)
 	}
-	return items
+	return wrappers
 }
 
 func (p *Party) GetClientOrder(client Client) []ItemOrder {
@@ -84,6 +93,17 @@ func (p *Party) IsClientOnParty(clientID string) bool {
 		}
 	}
 	return false
+}
+
+func (p *Party) GetClientByID(clientID string) (Client, error) {
+	// Verify content instead of key
+	list := p.GetClients()
+	for _, client := range list {
+		if client.Id == clientID {
+			return client, nil
+		}
+	}
+	return Client{}, errors.New("No Client found with given ID")
 }
 
 // TODO Avoid collisions

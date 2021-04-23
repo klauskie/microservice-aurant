@@ -6,3 +6,8 @@ type ItemOrder struct {
 	Quantity int `json:"quantity"`
 	Owner Client
 }
+
+type ClientOrderWrapper struct {
+	Client Client `json:"client"`
+	OrderList []ItemOrder `json:"order_list"`
+}

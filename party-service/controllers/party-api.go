@@ -415,7 +415,7 @@ func sendOrderBatch(party models.Party) {
 	batch := struct{
 		TAG string `json:"tag"`
 		RestaurantId string `json:"restaurant_id"`
-		Orders []models.ItemOrder `json:"orders"`
+		Orders []models.ClientOrderWrapper `json:"orders"`
 	}{
 		TAG: party.TAG,
 		RestaurantId: party.RestaurantId,
