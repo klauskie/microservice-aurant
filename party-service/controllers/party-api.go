@@ -263,7 +263,7 @@ func CreateClientOrder(c *gin.Context) {
 		})
 		return
 	}
-	party.AddClientOrder(item, tempClient)
+	party.AddClientOrder(item, clientID)
 
 	c.JSON(201, gin.H{
 		"message": "Order added",
@@ -276,9 +276,6 @@ func CreateClientOrder(c *gin.Context) {
 func GetClientOrder(c *gin.Context) {
 	partyId := c.Param("partyID")
 	clientID := c.GetString("token")
-	clientName := c.GetString("clientName")
-
-	tempClient := models.NewClient(clientID, clientName)
 
 	party := repository.GetPartyRepository().Get(partyId)
 	if party == nil {
@@ -295,10 +292,20 @@ func GetClientOrder(c *gin.Context) {
 		return
 	}
 
+	itemIds := party.GetClientItemIds(clientID)
+	itemCatalogMap := util.GetItemDefinitionMap(itemIds)
+	resultItemMap, err := party.GetClientOrder_withDefinition(clientID, itemCatalogMap)
+	if err != nil {
+		c.JSON(401, gin.H{
+			"message": err,
+		})
+		return
+	}
+
 	c.JSON(200, gin.H{
 		"message": "Order fetched",
 		"party-tag": party.TAG,
-		"Orders": party.GetClientOrder(tempClient),
+		"Orders": resultItemMap,
 	})
 }
 
@@ -322,10 +329,15 @@ func GetAllOrder(c *gin.Context) {
 		return
 	}
 
+	itemIds := party.GetAllItemIds()
+	itemCatalogMap := util.GetItemDefinitionMap(itemIds)
+	resultItemMap := party.GetCompleteOrder_withDefinition(itemCatalogMap, clientID)
+
+
 	c.JSON(200, gin.H{
 		"message": "Complete Order fetched",
 		"party-tag": party.TAG,
-		"Orders": party.GetCompleteOrder(),
+		"Orders": resultItemMap,
 	})
 }
 
@@ -407,6 +419,19 @@ func SendPrepareCommandOrderTest(c *gin.Context) {
 		"message": "Orders pushed",
 		"party-tag": party.TAG,
 		"party": models.NewPartyWrapper(party),
+	})
+}
+
+func GetItemDefinition(c *gin.Context) {
+	itemIds := []string{"550f74ee-c388-47a2-a193-aaef4a544249",
+		"6eb17429-e859-47cd-bd45-9e109e21c5e1",
+		"550f74ee-c388-47a2-a193-aaef4a544249",
+		"6eb17429-e859-47cd-bd45-9e109e21c5e1"}
+
+	body := util.GetItemDefinitionMap(itemIds)
+
+	c.JSON(200, gin.H{
+		"list": body,
 	})
 }
 
