@@ -1,0 +1,58 @@
+version: "3"
+
+services:
+    api-catalog:
+        container_name: api-catalog
+        build: ./catalog-service
+        volumes:
+            - ./catalog-service:/catalog-service
+        depends_on:
+            - db
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:mysql://aurant_db:3306/aurant_db?serverTimezone=MST
+        ports:
+            - "8080:8080"
+        networks:
+            aurant_connect:
+                ipv4_address: 172.25.0.5
+    api-party:
+        container_name: api-party
+        build: ./party-service
+        volumes:
+            - ./party-service:/go/src/klauskie.com/microservice-aurant/party-service
+        ports:
+            - "8081:8081"
+        networks:
+            aurant_connect:
+                ipv4_address: 172.25.0.2
+    api-session:
+        container_name: api-session
+        build: ./session-service
+        volumes:
+            - ./session-service:/go/src/klauskie.com/microservice-aurant/session-service
+        ports:
+            - "8083:8083"
+        networks:
+            aurant_connect:
+                ipv4_address: 172.25.0.3
+    db:
+        image: mysql:latest
+        container_name: aurant_db
+        volumes:
+            - "/var/lib/mysql"
+        environment:
+            MYSQL_ROOT_PASSWORD: toor
+            MYSQL_DATABASE: aurant_db
+            MYSQL_USER: aurant_user
+            MYSQL_PASSWORD: password1
+        ports:
+            - "33060:3306"
+        networks:
+            aurant_connect:
+                ipv4_address: 172.25.0.4
+networks:
+    aurant_connect:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 172.25.0.0/16
