@@ -50,7 +50,9 @@ public class Category implements Serializable {
     }
 
     public void update(Category that) {
-        this.setName(that.getName());
+        if (that.getName() != null) {
+            this.setName(that.getName());
+        }
     }
 
     /* Getters and Setters */

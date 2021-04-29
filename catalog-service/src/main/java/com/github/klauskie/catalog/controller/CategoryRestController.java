@@ -8,6 +8,8 @@ import com.github.klauskie.catalog.repository.CategoryRepository;
 import com.github.klauskie.catalog.repository.MenuItemRepository;
 import com.github.klauskie.catalog.repository.RestaurantRepository;
 import com.github.klauskie.catalog.util.Constant;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,11 +38,14 @@ public class CategoryRestController {
     }
 
     @GetMapping("/category/{UUID}")
+    @Cacheable(value = "categories", key = "#uuid")
     public Category getCategoryByUUID(@PathVariable(value = "UUID") String uuid) {
         return categoryRepository.findByCategoryId(uuid);
     }
 
     // TODO: GET list of categories by restaurantID + queryParams
+    // TODO: Cache list and refresh on user request
+    // @Cacheable(value = "category-list", key = "#uuid")
     @GetMapping("/category/restaurant/{UUID}")
     public Set<Category> getCategoryByRestaurantUUID(@PathVariable(value = "UUID") String uuid) {
         return categoryRepository.findAllByRestaurantId(uuid);
@@ -64,7 +69,8 @@ public class CategoryRestController {
     }
 
     @PutMapping("/category")
-    public void updateCategory(@RequestBody Map<String, String> requestMap) {
+    @CachePut(value = "categories", key = "#requestMap?.get('categoryId')")
+    public Category updateCategory(@RequestBody Map<String, String> requestMap) {
         Category existingCategory = categoryRepository.findByCategoryId(requestMap.get(Constant.KEY_CATEGORY_ID));
         if (existingCategory == null) {
             throw new GenericBadRequest("No Category found with given Id.");
@@ -78,10 +84,12 @@ public class CategoryRestController {
         } catch (DataIntegrityViolationException e) {
             throw new GenericBadRequest(e.getMessage());
         }
+        return existingCategory;
     }
 
     @PutMapping("/category/add/{itemUUID}")
-    public void appendItemToCategory(@PathVariable(value = "itemUUID") String itemUUID, @RequestBody Map<String, String> requestMap) {
+    @CachePut(value = "categories", key = "#requestMap?.get('categoryId')")
+    public Category appendItemToCategory(@PathVariable(value = "itemUUID") String itemUUID, @RequestBody Map<String, String> requestMap) {
         Category existingCategory = categoryRepository.findByCategoryId(requestMap.get(Constant.KEY_CATEGORY_ID));
         if (existingCategory == null) {
             throw new GenericBadRequest("No Category found with given Id.");
@@ -99,6 +107,7 @@ public class CategoryRestController {
         } catch (DataIntegrityViolationException e) {
             throw new GenericBadRequest(e.getMessage());
         }
+        return existingCategory;
     }
 
     // TODO: DELETE category by Id

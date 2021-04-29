@@ -10,9 +10,11 @@
 
 ### Item
 
-> GET all items: **api/item**
+> GET all items: **api/items**
 
-> GET all vendor's items: **api/item/:restaurantID**
+> GET item by id: **api/item/:itemId**
+
+> GET all vendor's items: **api/items/:restaurantID**
 
 > POST create new item: **api/item**
 

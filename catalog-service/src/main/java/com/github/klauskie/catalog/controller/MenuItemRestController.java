@@ -8,6 +8,8 @@ import com.github.klauskie.catalog.repository.CategoryRepository;
 import com.github.klauskie.catalog.repository.MenuItemRepository;
 import com.github.klauskie.catalog.repository.RestaurantRepository;
 import com.github.klauskie.catalog.util.Constant;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,13 +30,19 @@ public class MenuItemRestController {
     @Resource
     private RestaurantRepository restaurantRepository;
 
-    @GetMapping("/item")
+    @GetMapping("/items")
     public List<MenuItem> getMenuItems() {
         return itemRepository.findAll();
     }
 
+    @GetMapping("/item/{itemId}")
+    @Cacheable(value = "items", key = "#itemId")
+    public MenuItem getMenuItemById(@PathVariable(value = "itemId") String itemId) {
+        return itemRepository.findByItemId(itemId);
+    }
+
     // TODO: GET items by restaurantID and queryParams (categoryId, pagination, ...)
-    @GetMapping("/item/{restaurantID}")
+    @GetMapping("/items/{restaurantID}")
     public Set<MenuItem> getMenuItems_withQueryParams(@PathVariable(value = "restaurantID") String restaurantUUID,
                                                       @RequestParam(value="category", required=false) Optional<String> categoryUUID) {
 
@@ -103,7 +111,8 @@ public class MenuItemRestController {
     }
 
     @PutMapping("/item")
-    public void updateMenuItem(@RequestBody Map<String, Object> requestMap) {
+    @CachePut(value = "items", key = "#requestMap?.get('itemId')")
+    public MenuItem updateMenuItem(@RequestBody Map<String, Object> requestMap) {
         MenuItem existingItem = itemRepository.findByItemId((String) requestMap.get(Constant.KEY_ITEM_ID));
         if (existingItem == null) {
             throw new GenericBadRequest("No Item found with given Id.");
@@ -117,6 +126,7 @@ public class MenuItemRestController {
         } catch (DataIntegrityViolationException e) {
             throw new GenericBadRequest(e.getMessage());
         }
+        return existingItem;
     }
 
     // TODO: DELETE item by itemId

@@ -54,11 +54,21 @@ public class MenuItem implements Serializable {
     }
 
     public void update(MenuItem that) {
-        this.setName(that.getName());
-        this.setDescription(that.getDescription());
-        this.setPrice(that.getPrice());
-        this.setIsAvailable(that.getIsAvailable());
-        this.setIsDisplayable(that.getIsDisplayable());
+        if (that.getName() != null) {
+            this.setName(that.getName());
+        }
+        if (that.getDescription() != null) {
+            this.setDescription(that.getDescription());
+        }
+        if (that.getPrice() != null) {
+            this.setPrice(that.getPrice());
+        }
+        if (that.getIsAvailable() != null) {
+            this.setIsAvailable(that.getIsAvailable());
+        }
+        if (that.getIsDisplayable() != null) {
+            this.setIsDisplayable(that.getIsDisplayable());
+        }
     }
 
     /* Getters and Setters */

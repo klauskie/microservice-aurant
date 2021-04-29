@@ -10,6 +10,7 @@ services:
             - db
         environment:
             SPRING_DATASOURCE_URL: jdbc:mysql://aurant_db:3306/aurant_db?serverTimezone=MST
+            SPRING_REDIS_HOST: aurant_redis
         ports:
             - "8080:8080"
         networks:
@@ -50,6 +51,17 @@ services:
         networks:
             aurant_connect:
                 ipv4_address: 172.25.0.4
+    redis:
+        image: redis:latest
+        container_name: aurant_redis
+        volumes:
+            - "/var/lib/redis"
+            - "/usr/local/etc/redis/redis.conf"
+        ports:
+            - "6379:6379"
+        networks:
+            aurant_connect:
+                ipv4_address: 172.25.0.6
 networks:
     aurant_connect:
         driver: bridge
