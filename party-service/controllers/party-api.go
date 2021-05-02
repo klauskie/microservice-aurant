@@ -15,6 +15,15 @@ import (
 	"klauskie.com/microservice-aurant/party-service/util"
 )
 
+// GET /test/party
+func GetAllParties(c *gin.Context) {
+	//partyMap := repository.GetPartyRepository().GetAll()
+
+	c.JSON(200, gin.H{
+		"message": "Unavailable",
+	})
+}
+
 // GET /party/:vendorID
 func CreateParty(c *gin.Context) {
 	//vendorUUID := c.Param("vendorID")

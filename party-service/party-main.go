@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"klauskie.com/microservice-aurant/party-service/controllers"
+	"klauskie.com/microservice-aurant/party-service/util"
 )
 
 func main() {
@@ -30,7 +31,10 @@ func main() {
 
 		api.POST("/test/prepare-order", controllers.SendPrepareCommandOrderTest)
 		api.GET("/test/item-definition", controllers.GetItemDefinition)
+		api.GET("/test/party", controllers.GetAllParties)
 	}
+
+	util.ClearCacheCron()
 
 	r.Run(":8081")
 }

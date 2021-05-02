@@ -7,16 +7,17 @@ import (
 
 var instance *repoParty = nil
 
-type PartyRepository interface {
+type iPartyRepository interface {
 	Add(party *models.Party)
 	Get(tag string) *models.Party
 	Remove(tag string) error
 	Update(party *models.Party) error
-	GetAll() map[string]*models.Party
+	ClearAll()
+	//GetAll() map[string]*models.Party
 }
 
 // PartyRepository
-func GetPartyRepository() PartyRepository {
+func GetPartyRepository() iPartyRepository {
 	if instance == nil {
 		instance = new(repoParty)
 		instance.collection = make(map[string]*models.Party)
@@ -54,6 +55,13 @@ func (r repoParty) Update(party *models.Party) error {
 		return nil
 	}
 	return errors.New("could not find Party, create party first")
+}
+
+func (r repoParty) ClearAll() {
+	for key, _ := range r.collection {
+		delete(r.collection, key)
+	}
+	// r.collection = make(map[string]*models.Party)
 }
 
 func (r repoParty) GetAll() map[string]*models.Party {
