@@ -13,6 +13,7 @@ type SessionRepository interface {
 	Remove(tag string) error
 	Update(party *models.SimpleUser) error
 	GetAll() map[string]*models.SimpleUser
+	ClearAll()
 }
 
 // SessionRepository
@@ -58,4 +59,11 @@ func (r repoSession) Update(party *models.SimpleUser) error {
 
 func (r repoSession) GetAll() map[string]*models.SimpleUser {
 	return r.collection
+}
+
+func (r repoSession) ClearAll() {
+	for key, _ := range r.collection {
+		delete(r.collection, key)
+	}
+	// r.collection = make(map[string]*models.Party)
 }

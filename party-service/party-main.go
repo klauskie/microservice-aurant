@@ -12,7 +12,7 @@ func main() {
 	r.Use(controllers.CORSMiddleware)
 	r.Use(controllers.TokenAuthMiddleware)
 
-	api := r.Group("/party-api")
+	api := r.Group("/api")
 	{
 		// TODO use query params
 		api.POST("/party", controllers.CreateParty)
