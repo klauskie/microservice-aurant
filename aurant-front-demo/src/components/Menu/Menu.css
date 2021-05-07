@@ -1,0 +1,58 @@
+.grid-container {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-areas: 
+      "A B"
+      "C C";
+}
+
+.item-container {
+    padding: 3px 0px;
+    border-bottom: 1px solid rgb(175, 175, 175);
+    margin: 5px 0px;
+    cursor: pointer;
+    padding: 1px;
+}
+
+.item-container:hover {
+    background-color: #F3F2F1;
+}
+
+.h2-tag {
+    font-weight: bold;
+    font-size: 200%;
+    text-align: left;
+    margin-top: 5%;
+    margin-bottom: 1%;
+}
+
+.name-block {
+    grid-area: A;
+    text-align: left;
+    font-weight: bold;
+    font-size: large;
+}
+
+.price-block {
+    grid-area: B;
+    text-align: right;
+}
+
+.description-block {
+    grid-area: C;
+    text-align: left;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.disable {
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+.hide {
+    display: none;
+}

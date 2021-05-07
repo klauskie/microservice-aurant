@@ -1,0 +1,19 @@
+.header-container {
+    margin: 2% 2%;
+    text-align: left;
+}
+
+.description-container {
+    text-align: justify;
+}
+
+#description-label {
+    display:inline-block;
+}
+
+#description {
+    display:inline-block;
+    text-align:left;
+    padding-left: 10px;
+    font-size: large;
+}

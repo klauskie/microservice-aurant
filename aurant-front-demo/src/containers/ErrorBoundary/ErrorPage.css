@@ -1,0 +1,19 @@
+#error-container {
+    background-color: rgb(0, 247, 255);
+}
+
+.content {
+    transform: translateY(50%);
+    background-color: white;
+    border-radius: 50%;
+    height: 100px;
+}
+
+.text-box {
+    transform: translateZ(200px);
+    background-color: white;
+}
+
+img {
+    margin: 10% auto;
+}

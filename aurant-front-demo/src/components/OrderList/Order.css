@@ -1,0 +1,118 @@
+.grid-order-container {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-areas: 
+      "A"
+      "C"
+      "D"
+      "B";
+}
+
+.order-container {
+    padding: 3px 0px;
+    border-bottom: 1px dashed rgb(175, 175, 175);
+    margin: 5px 0px;
+    padding: 1px;
+}
+
+.vertical-filler {
+    margin: 8% 0;
+}
+
+.align-right {
+    text-align: right;
+}
+
+.A-block {
+    grid-area: A;
+    text-align: left;
+    font-weight: bold;
+    font-size: large;
+}
+
+.B-block {
+    grid-area: B;
+    text-align: right;
+}
+
+.C-block {
+    grid-area: C;
+    text-align: left;
+}
+
+.D-block {
+    grid-area: D;
+    text-align: left;
+}
+
+.second-color {
+    color: rgb(109, 109, 109);
+}
+
+.attention-color {
+    color: rgb(19, 17, 17);
+    font-size: large;
+}
+
+.attention-color-red {
+    color: rgb(202, 66, 66);
+    font-size: large;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.flex-row-container {
+    display: flex;
+    flex-direction: row; 
+    align-items: center;
+}
+
+.left-f {
+    flex: 50%;
+    text-align: left;
+}
+
+.right-f {
+    flex: 50%;
+    text-align: right;
+}
+
+.h3-tag {
+    font-weight: 10;
+    font-size: 200%;
+}
+
+.font-smaller-20 {
+    font-size: 150%;
+}
+
+/* Vertical list */
+.flex-col-container {
+    display: flex;
+    flex-direction: column; 
+}
+
+.flex-item {
+    display: flex;             /* nested flex container */
+    flex-direction: row;    /* vertical alignment of flex items */
+    justify-content: center;   /* center flex items vertically */
+    align-items: center;       /* center flex items horizontally */
+}
+
+.item-flex-row-s {
+    flex: 20%;
+}
+
+.item-flex-row-l {
+    flex: 80%;
+}
+
+.v-line {
+    width: 1px;
+    height: 100%;
+    float: left;
+    border: 1px inset;
+}
+

@@ -1,6 +1,16 @@
 version: "3"
 
 services:
+    app-demo:
+        container_name: app-demo
+        build: ./aurant-front-demo
+        volumes:
+            - ./aurant-front-demo:/app
+        ports:
+            - "80:3000"
+        networks:
+            aurant_connect:
+                ipv4_address: 172.25.0.6
     api-catalog:
         container_name: api-catalog
         build: ./catalog-service

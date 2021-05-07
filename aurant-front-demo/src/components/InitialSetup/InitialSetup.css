@@ -1,0 +1,45 @@
+.form-group label {
+	width: 100%;
+    text-align: left;
+    margin-bottom: 1%;
+}
+
+.btn .btn-block {
+	padding: 12px 10px;
+}
+
+.form-control {
+	border-width: 2.3px;
+}
+
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.a-tag {
+    text-decoration: none;
+    color: #DC3545;
+    cursor: pointer;
+}
+
+.a-tag:hover {
+    text-decoration: none;
+    color: #C82333;
+}
+
+.color-red {
+    color: #DC3545;
+}
+
+.margin-top {
+    margin-top: 10%;
+}
+
+.bold {
+    font-weight: bold;
+    font-size: larger;
+}

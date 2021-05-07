@@ -1,0 +1,23 @@
+.client-container {
+    /* nothing */
+}
+
+.empty-container {
+    background-color: rgb(231, 231, 231);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    height: 100%;
+}
+
+.center-icon {
+    display: block;
+    margin: 0 auto;
+    opacity: 0.5;
+}
+
+.empty-container:hover .center-icon {
+    color: red;
+    width: 30%;
+    height: 30%;
+}
