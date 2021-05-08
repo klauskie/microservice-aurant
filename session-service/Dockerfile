@@ -25,10 +25,10 @@ COPY . .
 
 ## OPTION 2
 
-# RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o /go/bin/app
-# RUN chmod +x /go/bin/app
-# ENTRYPOINT ["/go/bin/app"]
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o /go/bin/app
+RUN chmod +x /go/bin/app
+ENTRYPOINT ["/go/bin/app"]
 
 ## OPTION 3 : dev
 
-CMD ["go","run","session-main.go"]
+# CMD ["go","run","session-main.go"]
