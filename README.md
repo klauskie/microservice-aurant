@@ -17,6 +17,7 @@ Food ordering system for you and your friends inside the restaurant
 ### Backend (Microservice Architecture): 
 
 Tech used: Golang, Go Gin Framework, Java Spring Boot, MySql, Redis, Docker
+
 Hosted on Digital Ocean
 
 ### Frontend:
